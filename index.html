@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    #message-container {
+      width: 80%;
+      max-width: 1200px;
+    }
+
+    #message-container div {
+      background-color: #ccc;
+      padding: 5px;
+    }
+
+    #message-container div:nth-child(2n) {
+      background-color: #fff;
+    }
+
+    #send-container {
+      position: fixed;
+      padding-bottom: 30px;
+      bottom: 0;
+      background-color: white;
+      max-width: 1200px;
+      width: 80%;
+      display: flex;
+    }
+
+    #message-input {
+      flex-grow: 1;
+    }
+  </style>
+  <body>
+    <ul id="message-container"></ul>
+    <form id="send-container">
+      <input type="text" id="message-input" />
+      <button type="submit" id="send-button">Send</button>
+    </form>
+  </body>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    const socket = io();
+    const name = prompt("Tên bạn là gì");
+    const messUlEl = document.querySelector("#message-container");
+    const formEl = document.querySelector("#send-container");
+    const inputEl = document.querySelector("#message-input");
+
+    formEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      socket.emit("user-sendchat", {
+        message: inputEl.value,
+        name: name,
+      });
+      inputEl.value = "";
+    });
+
+    socket.on("server-sendchat", (data) => {
+      const messItem = document.createElement("li");
+      messItem.innerText = `${data.name}: ${data.message}`;
+
+      messUlEl.appendChild(messItem);
+    });
+  </script>
+</html>
